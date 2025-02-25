@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-table';
 import TableForm from './TableForm';
+// import RadioButton from './components/RadioButton';
 
 const TableRender = () => {
     const [data, setData] = useState([{}]);
@@ -10,6 +11,8 @@ const TableRender = () => {
     const [contact, setContact] = useState("");
     const [country, setCountry] = useState("");
     const [formMode, setFormMode] = useState("create");
+    const [selectRows, setSelectRows] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
 
     useEffect(() => {
         setData([
@@ -18,9 +21,12 @@ const TableRender = () => {
         ])
     }, []);
 
-    const selectedRow = (e) => {
-        const findRecord = data.find(record => record.id === parseInt(e.target.id));
+    const selectedRow = (index) => {
+        const findRecord = data[index]
         setEditRecord(findRecord);
+        setCompany(findRecord.company);
+        setContact(findRecord["contact-name"]);
+        setCountry(findRecord.country);
         setFormMode("edit");
     }
 
@@ -36,13 +42,12 @@ const TableRender = () => {
             }
         }
         if (formMode === "edit") {
-            let recordIndex = data.filter((record, index) => {
+            let recordIndex;
+            data.find((record, index) => {
                 if (record.company === editRecord.company) {
-                    return index;
+                    recordIndex = index;
                 }
             });
-            // find use and 39-41
-            recordIndex = recordIndex[0].id - 1;
             let actualData = data;
             actualData[recordIndex]["contact-name"] = contact;
             actualData[recordIndex].country = country;
@@ -51,7 +56,6 @@ const TableRender = () => {
             setFormMode("create");
         } else {
             setData([...data, { company, "contact-name": contact, country: country }]);
-            // (...)=> 3 dots  spread operator
         }
         setErrors({});
         setCompany("");
@@ -59,30 +63,66 @@ const TableRender = () => {
         setCountry("");
     }
 
+
     const deleteRecord = (e) => {
         let copyData = data;
-
         // const id = parseInt(e.target.id) - 1;
         // // @parseInt — A string to convert into a number.
-
         const id = parseInt(e.target.id);
-
         copyData.splice(id, 1);
         // deleting the elements from the data
         setData([...copyData]);
     }
+
+    const deleteAllRecord = () => {
+        setData([]);
+
+    }
+    // const deleteSelectedRecords = (index) => {
+    //     const filteredData = data.filter((_, i) => i !== index);
+    //     setData(filteredData);
+    // };
+
+    // Delete selected records
+    const deleteSelectedRecords = () => {
+        const filteredData = data.filter((_, index) => !selectRows.includes(index));
+        setData(filteredData);
+        setSelectAll([]);
+    };
+
+    // Move handleSelectAll outside handleCheckboxChange
+    const handleSelectAll = () => {
+        if (selectAll) {
+            setSelectRows([]); // Deselect all
+        } else {
+            setSelectRows(data.map((_, index) => index)); // Select all
+        }
+        setSelectAll(!selectAll);
+    };
+    // Handle individual checkbox selection
+    const handleCheckboxChange = (index) => {
+        setSelectRows((prev) =>
+            prev.includes(index)
+                ? prev.filter((item) => item !== index) // Deselect
+                : [...prev, index] // Select
+        );
+    };
 
     return (
         <>
             <div className='row'>
                 <div className='col-6 d-flex justify-content-end'>
                     <button className='btn btn-primary' style={{ float: 'right' }}>+</button>
+                    <button className='btn btn-danger' id="delete-all" onClick={deleteAllRecord} style={{ marginLeft: '5px' }}>-</button>
+                    {selectRows.length > 0 && (
+                        <button className='btn btn-danger' id="delete-all" onClick={deleteSelectedRecords} style={{ marginLeft: '5px' }}>DEL</button>)}
                 </div>
             </div>
             <div className='row'>
                 <span className='col-1'></span>
-                <table className='col-5' style={{ border: '1px solid black' }}>
+                <table className='col-3' style={{ border: '1px solid black' }}>
                     <tr style={{ border: '1px solid black' }}>
+                        <th><input type="checkbox" onClick={handleSelectAll} /></th>
                         <th style={{ border: '1px solid black' }}>Company</th>
                         <th style={{ border: '1px solid black' }}>Contact</th>
                         <th style={{ border: '1px solid black' }}>Country</th>
@@ -90,7 +130,8 @@ const TableRender = () => {
                     </tr>
                     {data.map((entry, index) => (
                         <tr style={{ border: '1px solid black' }}>
-                            <td style={{ border: '1px solid black' }} onClick={selectedRow} id={entry.id}>{entry.company}</td>
+                            <td > <input type="checkbox" onChange={() => handleCheckboxChange(index)} checked={selectRows.includes(index)} /></td>
+                            <td style={{ border: '1px solid black' }} onClick={selectedRow} id={index}>{entry.company}</td>
                             <td style={{ border: '1px solid black' }}>{entry["contact-name"]}</td>
                             <td style={{ border: '1px solid black' }}>{entry?.country || "India"}</td>
                             <td style={{ border: '1px solid black' }}>
@@ -113,9 +154,10 @@ const TableRender = () => {
                         formMode={formMode}
                     />
                 </div>
-            </div>
+            </div >
         </>
     )
-}
+};
+
 
 export default TableRender;

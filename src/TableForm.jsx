@@ -28,7 +28,7 @@ function TableForm(props) {
     }, [editRecord])
 
     return (
-        <>
+        <><RadioButton title="Gender" name="gender" id="gender" options={genderOptions} />
             <Input
                 title="Company"
                 id="company"
