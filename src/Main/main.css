@@ -1,0 +1,15 @@
+.mainHeader {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: blue;
+    color: white;
+    text-align: center;
+}
+
+#mainFooter {
+    padding: 0 0 5px 5px;
+    background-color: grey;
+    color: white;
+    font-size: 15px;
+    text-align: center;
+}

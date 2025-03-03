@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import Input from './components/Input';
-import Select from './components/select'
+import Select from './components/select';
 import Checkbox from './components/checkbox';
-import RadioButton from './components/RadioButton'
+import RadioButton from './components/RadioButton';
 
 function TableForm(props) {
-    const { company, contact, country, errors, onSave, setCompany, setContact, setCountry, editRecord, formMode } = props;
+    const { company, contact, country, errors, onSave, setCompany, setContact, setCountry, editRecord, formMode, setView } = props;
     const genderOptions = [{
         value: 'male',
         label: 'Male'
@@ -13,13 +13,6 @@ function TableForm(props) {
         value: 'female',
         label: 'Female'
     }]
-    const dropdownOptions = [{
-        value: 'Uk', label: 'Uk'
-    },
-    { value: 'Usa', label: 'Usa' },
-    { value: 'India', label: 'India' },
-    { value: 'Australia', label: 'Australia' }]
-
 
     useEffect(() => {
         setCompany(editRecord.company);
@@ -28,7 +21,7 @@ function TableForm(props) {
     }, [editRecord])
 
     return (
-        <><RadioButton title="Gender" name="gender" id="gender" options={genderOptions} />
+        <>
             <Input
                 title="Company"
                 id="company"
@@ -39,11 +32,11 @@ function TableForm(props) {
                 isDisable={formMode === "edit"}
             />
             <Input title="Contact" id="contact" placeholder="contact name" value={contact} setChangeValue={setContact} error={errors.contact || false} />
-            {/* <Select title="Country" id="country" setChangeValue={setCountry} value={country} /> */}
-            <Select title="Country" id="country" options={dropdownOptions} setChangeValue={setCountry} />
+            <Select title="Country" id="country" setChangeValue={setCountry} value={country} />
             <Checkbox title="VIP" id="vip" defaultValue={true} />
             <RadioButton title="Gender" name="gender" id="gender" options={genderOptions} />
-            <button className='btn btn-primary' onClick={onSave}>Add</button>
+            <button className='btn btn-primary ' style={{ float: 'right' }} onClick={onSave}>Add</button>
+            <button className='btn btn-secondary me-2' style={{ marginLeft: "5px", float: 'right' }} onClick={() => setView("table")}>Cancel</button>
         </>
     )
 }

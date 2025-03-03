@@ -7,20 +7,27 @@ import reportWebVitals from './reportWebVitals';
 import SignUp from './Project/signup';
 import Login from './Project/login';
 import TableRender from './TableRender';
+import Main from './Main/main.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {/* <TableRender /> */}
-    <Router>
-      <Routes>
+    <header className='mainHeader'>
+      <h1>Company Details</h1>
+    </header>
+    <TableRender />
+    <footer id='mainFooter' className='fixed-bottom'>
+      React JS practice
+    </footer>
+    {/* <Router> */}
+    {/* <Routes>
         <Route path="/" element={<Navigate to="/Project/signup" />} />
         <Route path="/Project/signup" element={<SignUp />} />
         <Route path="/Project/login" element={<Login />} />
       </Routes>
-    </Router>
+    </Router> */}
   </React.StrictMode>
 
 

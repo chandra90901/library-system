@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-table';
 import TableForm from './TableForm';
-// import RadioButton from './components/RadioButton';
 
 const TableRender = () => {
     const [data, setData] = useState([{}]);
@@ -11,23 +10,20 @@ const TableRender = () => {
     const [contact, setContact] = useState("");
     const [country, setCountry] = useState("");
     const [formMode, setFormMode] = useState("create");
-    const [selectRows, setSelectRows] = useState([]);
-    const [selectAll, setSelectAll] = useState(false);
+    const [view, setView] = useState("table");
 
     useEffect(() => {
         setData([
-            { id: 1, company: 'Blueverse', "contact-name": "XYZ", country: "uk" },
-            { id: 2, company: 'Garudaven', "contact-name": "Chenna Reddy", country: "usa" }
+            { company: 'Blueverse', "contact-name": "XYZ", country: "uk" },
+            { company: 'Garudaven', "contact-name": "Chenna Reddy", country: "usa" }
         ])
     }, []);
 
-    const selectedRow = (index) => {
-        const findRecord = data[index]
+    const selectedRow = (e) => {
+        const findRecord = data[e.target.id];
         setEditRecord(findRecord);
-        setCompany(findRecord.company);
-        setContact(findRecord["contact-name"]);
-        setCountry(findRecord.country);
         setFormMode("edit");
+        setView("form");
     }
 
     const onSave = () => {
@@ -61,103 +57,82 @@ const TableRender = () => {
         setCompany("");
         setContact("");
         setCountry("");
+        setView("table");
     }
-
 
     const deleteRecord = (e) => {
         let copyData = data;
-        // const id = parseInt(e.target.id) - 1;
-        // // @parseInt — A string to convert into a number.
         const id = parseInt(e.target.id);
         copyData.splice(id, 1);
-        // deleting the elements from the data
         setData([...copyData]);
     }
 
     const deleteAllRecord = () => {
         setData([]);
-
     }
-    // const deleteSelectedRecords = (index) => {
-    //     const filteredData = data.filter((_, i) => i !== index);
-    //     setData(filteredData);
-    // };
-
-    // Delete selected records
-    const deleteSelectedRecords = () => {
-        const filteredData = data.filter((_, index) => !selectRows.includes(index));
-        setData(filteredData);
-        setSelectAll([]);
-    };
-
-    // Move handleSelectAll outside handleCheckboxChange
-    const handleSelectAll = () => {
-        if (selectAll) {
-            setSelectRows([]); // Deselect all
-        } else {
-            setSelectRows(data.map((_, index) => index)); // Select all
-        }
-        setSelectAll(!selectAll);
-    };
-    // Handle individual checkbox selection
-    const handleCheckboxChange = (index) => {
-        setSelectRows((prev) =>
-            prev.includes(index)
-                ? prev.filter((item) => item !== index) // Deselect
-                : [...prev, index] // Select
-        );
-    };
 
     return (
         <>
-            <div className='row'>
-                <div className='col-6 d-flex justify-content-end'>
-                    <button className='btn btn-primary' style={{ float: 'right' }}>+</button>
-                    <button className='btn btn-danger' id="delete-all" onClick={deleteAllRecord} style={{ marginLeft: '5px' }}>-</button>
-                    {selectRows.length > 0 && (
-                        <button className='btn btn-danger' id="delete-all" onClick={deleteSelectedRecords} style={{ marginLeft: '5px' }}>DEL</button>)}
-                </div>
+            <div className='row' style={{ marginTop: '5px' }}>
+                {view === 'table' ?
+                    <>
+                        <div className='row'>
+                            <div className='col-10 d-flex justify-content-end'>
+                                <button className='btn btn-primary me-1' onClick={() => setView("form")}>+</button>
+                                <button className='btn btn-danger ' id="delete-all" onClick={deleteAllRecord}>-</button>
+
+                            </div>
+
+                        </div>
+                        <div className='row'>
+                            <span className='col-1'></span>
+                            <table className='col-10' style={{ border: '1px solid black' }}>
+                                <tr style={{ border: '1px solid black' }}>
+                                    <th style={{ border: '1px solid black' }}>Company</th>
+                                    <th style={{ border: '1px solid black' }}>Contact</th>
+                                    <th style={{ border: '1px solid black' }}>Country</th>
+                                    <th style={{ border: '1px solid black' }}>
+
+                                    </th>
+                                </tr>
+                                {data.map((entry, index) => (
+                                    <tr style={{ border: '1px solid black' }}>
+                                        <td style={{ border: '1px solid black' }} onClick={selectedRow} id={index}>{entry.company}</td>
+                                        <td style={{ border: '1px solid black' }}>{entry["contact-name"]}</td>
+                                        <td style={{ border: '1px solid black' }}>{entry?.country || "India"}</td>
+                                        <td style={{ border: '1px solid black' }}>
+                                            <button className='btn btn-danger' id={index} onClick={deleteRecord}>-</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </table>
+                            <span className='col-1'></span>
+                        </div>
+                    </> :
+                    <>
+                        <span className='col-1'></span>
+                        <span className='col-10'>
+                            <h2 style={{ textAlign: "center" }}>Enter Details</h2>
+                            <TableForm
+                                company={company}
+                                contact={contact}
+                                country={country}
+                                errors={errors}
+                                setCompany={setCompany}
+                                setContact={setContact}
+                                setCountry={setCountry}
+                                editRecord={editRecord}
+                                onSave={onSave}
+                                formMode={formMode}
+                                setView={setView}
+                            />
+                        </span>
+                        <span className='col-1'></span>
+                    </>
+                }
             </div>
-            <div className='row'>
-                <span className='col-1'></span>
-                <table className='col-3' style={{ border: '1px solid black' }}>
-                    <tr style={{ border: '1px solid black' }}>
-                        <th><input type="checkbox" onClick={handleSelectAll} /></th>
-                        <th style={{ border: '1px solid black' }}>Company</th>
-                        <th style={{ border: '1px solid black' }}>Contact</th>
-                        <th style={{ border: '1px solid black' }}>Country</th>
-                        <th style={{ border: '1px solid black' }}></th>
-                    </tr>
-                    {data.map((entry, index) => (
-                        <tr style={{ border: '1px solid black' }}>
-                            <td > <input type="checkbox" onChange={() => handleCheckboxChange(index)} checked={selectRows.includes(index)} /></td>
-                            <td style={{ border: '1px solid black' }} onClick={selectedRow} id={index}>{entry.company}</td>
-                            <td style={{ border: '1px solid black' }}>{entry["contact-name"]}</td>
-                            <td style={{ border: '1px solid black' }}>{entry?.country || "India"}</td>
-                            <td style={{ border: '1px solid black' }}>
-                                <button className='btn btn-danger' id={index} onClick={deleteRecord}>-</button>
-                            </td>
-                        </tr>
-                    ))}
-                </table>
-                <div className='col-6'>
-                    <TableForm
-                        company={company}
-                        contact={contact}
-                        country={country}
-                        errors={errors}
-                        setCompany={setCompany}
-                        setContact={setContact}
-                        setCountry={setCountry}
-                        editRecord={editRecord}
-                        onSave={onSave}
-                        formMode={formMode}
-                    />
-                </div>
-            </div >
         </>
     )
-};
-
+}
 
 export default TableRender;
